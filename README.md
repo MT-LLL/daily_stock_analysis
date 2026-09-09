@@ -67,7 +67,6 @@
 
 > 5 分钟完成部署，零成本，无需服务器。
 
-
 #### 1. Fork 本仓库
 
 点击右上角 `Fork` 按钮（顺便点个 Star⭐ 支持一下）
@@ -96,7 +95,6 @@
 <details>
 <summary><b>通知渠道配置</b>（点击展开，至少配置一个）</summary>
 
-
 | Secret 名称 | 说明 | 必填 |
 |------------|------|:----:|
 | `WECHAT_WEBHOOK_URL` | 企业微信 Webhook URL | 可选 |
@@ -120,9 +118,6 @@
 | `REPORT_SUMMARY_ONLY` | 仅分析结果摘要：设为 `true` 时只推送汇总，不含个股详情 | 可选 |
 | `ANALYSIS_DELAY` | 个股分析和大盘分析之间的延迟（秒），避免API限流，如 `10` | 可选 |
 | `MERGE_EMAIL_NOTIFICATION` | 个股与大盘复盘合并推送（默认 false），减少邮件数量 | 可选 |
-
-> 至少配置一个渠道，配置多个则同时推送。更多配置请参考 [完整指南](docs/full-guide.md)
-
 </details>
 
 **其他配置**
@@ -156,203 +151,8 @@
 
 默认每个**工作日 18:00（北京时间）**自动执行，也可手动触发。默认非交易日（含 A/H/US 节假日）不执行。
 
-> 💡 **关于跳过交易日检查的两种机制：**
-> | 机制 | 配置方式 | 生效范围 | 适用场景 |
-> |------|----------|----------|----------|
-> | `TRADING_DAY_CHECK_ENABLED=false` | 环境变量/Secrets | 全局、长期有效 | 测试环境、长期关闭检查 |
-> | `force_run` (UI 勾选) | Actions 手动触发时选择 | 单次运行 | 临时在非交易日执行一次 |
->
-> - **环境变量方式**：在 `.env` 或 GitHub Secrets 中设置，影响所有运行方式（定时触发、手动触发、本地运行）
-> - **UI 勾选方式**：仅在 GitHub Actions 手动触发时可见，不影响定时任务，适合临时需求
-
-### 方式二：本地运行 / Docker 部署
-
-```bash
-# 克隆项目
-git clone https://github.com/ZhuLinsen/daily_stock_analysis.git && cd daily_stock_analysis
-
-# 安装依赖
-pip install -r requirements.txt
-
-# 配置环境变量
-cp .env.example .env && vim .env
-
-# 运行分析
-python main.py
-```
-
-> Docker 部署、定时任务配置请参考 [完整指南](docs/full-guide.md)
-> 桌面客户端打包请参考 [桌面端打包说明](docs/desktop-package.md)
-
-## 📱 推送效果
-
-### 决策仪表盘
-```
-🎯 2026-02-08 决策仪表盘
-共分析3只股票 | 🟢买入:0 🟡观望:2 🔴卖出:1
-
-📊 分析结果摘要
-⚪ 中钨高新(000657): 观望 | 评分 65 | 看多
-⚪ 永鼎股份(600105): 观望 | 评分 48 | 震荡
-🟡 新莱应材(300260): 卖出 | 评分 35 | 看空
-
-⚪ 中钨高新 (000657)
-📰 重要信息速览
-💭 舆情情绪: 市场关注其AI属性与业绩高增长，情绪偏积极，但需消化短期获利盘和主力流出压力。
-📊 业绩预期: 基于舆情信息，公司2025年前三季度业绩同比大幅增长，基本面强劲，为股价提供支撑。
-
-🚨 风险警报:
-
-风险点1：2月5日主力资金大幅净卖出3.63亿元，需警惕短期抛压。
-风险点2：筹码集中度高达35.15%，表明筹码分散，拉升阻力可能较大。
-风险点3：舆情中提及公司历史违规记录及重组相关风险提示，需保持关注。
-✨ 利好催化:
-
-利好1：公司被市场定位为AI服务器HDI核心供应商，受益于AI产业发展。
-利好2：2025年前三季度扣非净利润同比暴涨407.52%，业绩表现强劲。
-📢 最新动态: 【最新消息】舆情显示公司是AI PCB微钻领域龙头，深度绑定全球头部PCB/载板厂。2月5日主力资金净卖出3.63亿元，需关注后续资金流向。
-
----
-生成时间: 18:00
-```
-
-### 大盘复盘
-```
-🎯 2026-01-10 大盘复盘
-
-📊 主要指数
-- 上证指数: 3250.12 (🟢+0.85%)
-- 深证成指: 10521.36 (🟢+1.02%)
-- 创业板指: 2156.78 (🟢+1.35%)
-
-📈 市场概况
-上涨: 3920 | 下跌: 1349 | 涨停: 155 | 跌停: 3
-
-🔥 板块表现
-领涨: 互联网服务、文化传媒、小金属
-领跌: 保险、航空机场、光伏设备
-```
-## ⚙️ 配置说明
-
-> 📖 完整环境变量、定时任务配置请参考 [完整配置指南](docs/full-guide.md)
-
-
-## 🖥️ Web 界面
-
-![img.png](sources/fastapi_server.png)
-
-包含完整的配置管理、任务监控和手动分析功能。
-
-**可选密码保护**：在 `.env` 中设置 `ADMIN_AUTH_ENABLED=true` 可启用 Web 登录，首次访问在网页设置初始密码，保护 Settings 中的 API 密钥等敏感配置。详见 [完整指南](docs/full-guide.md)。
-
-### 从图片添加股票
-
-在 **设置 → 基础设置** 中找到「从图片添加」区块，拖拽或选择自选股截图（如 APP 持仓页、行情列表截图），系统会通过 Vision AI 自动识别股票代码并合并到自选列表。
-
-**配置与限制**：
-- 需配置 `GEMINI_API_KEY`、`ANTHROPIC_API_KEY` 或 `OPENAI_API_KEY` 中至少一个（Vision 能力模型）
-- 支持 JPG、PNG、WebP、GIF，单张最大 5MB；请求超时 60 秒
-
-**API 调用**：`POST /api/v1/stocks/extract-from-image`，表单字段 `file`，返回 `{ "codes": ["600519", "300750", ...] }`。详见 [完整指南](docs/full-guide.md)。
-
-### 🤖 Agent 策略问股
-
-在 `.env` 中设置 `AGENT_MODE=true` 后启动服务，访问 `/chat` 页面即可开始多轮策略问答。
-
-- **选择策略**：均线金叉、缠论、波浪理论、多头趋势等 11 种内置策略
-- **自然语言提问**：如「用缠论分析 600519」，Agent 自动调用实时行情、K线、技术指标、新闻等工具
-- **流式进度反馈**：实时展示 AI 思考路径（行情获取 → 技术分析 → 新闻搜索 → 生成结论）
-- **多轮对话**：支持追问上下文，会话历史持久化保存
-- **Bot 支持**：`/ask <code> [strategy]` 命令触发策略分析
-- **自定义策略**：在 `strategies/` 目录下新建 YAML 文件即可添加策略，无需写代码
-
-> **注意**：Agent 模式依赖外部 LLM（Gemini/OpenAI 等），每次对话会产生 API 调用费用。不影响非 Agent 模式（`AGENT_MODE=false` 或未设置）的正常运行。
-
-### 启动方式
-
-1. **启动服务**（默认会自动编译前端）
-   ```bash
-   python main.py --webui       # 启动 Web 界面 + 执行定时分析
-   python main.py --webui-only  # 仅启动 Web 界面
-   ```
-   启动时会在 `apps/dsa-web` 自动执行 `npm install && npm run build`。
-   如需关闭自动构建，设置 `WEBUI_AUTO_BUILD=false`，并改为手动执行：
-   ```bash
-   cd ./apps/dsa-web
-   npm install && npm run build
-   cd ../..
-   ```
-
-访问 `http://127.0.0.1:8000` 即可使用。
-
-> 也可以使用 `python main.py --serve` (等效命令)
-
-## 🗺️ Roadmap
-
-查看已支持的功能和未来规划：[更新日志](docs/CHANGELOG.md)
-
-> 有建议？欢迎 [提交 Issue](https://github.com/ZhuLinsen/daily_stock_analysis/issues)
-
+> 本项目仅供学习和研究使用，不构成任何投资建议。股市有风险，投资需谨慎。作者不对使用本项目产生的任何损失负责。
 
 ---
 
-## ☕ 支持项目
-
-如果本项目对你有帮助，欢迎支持项目的持续维护与迭代，感谢支持 🙏  
-赞赏可备注联系方式，祝股市长虹
-
-| 支付宝 (Alipay) | 微信支付 (WeChat) | Ko-fi |
-| :---: | :---: | :---: |
-| <img src="./sources/alipay.jpg" width="200" alt="Alipay"> | <img src="./sources/wechatpay.jpg" width="200" alt="WeChat Pay"> | <a href="https://ko-fi.com/mumu157" target="_blank"><img src="./sources/ko-fi.png" width="200" alt="Ko-fi"></a> |
-
----
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-详见 [贡献指南](docs/CONTRIBUTING.md)
-
-### 本地门禁（建议先跑）
-
-```bash
-pip install -r requirements.txt
-pip install flake8 pytest
-./scripts/ci_gate.sh
-```
-
-如修改前端（`apps/dsa-web`）：
-
-```bash
-cd apps/dsa-web
-npm ci
-npm run lint
-npm run build
-```
-
-## 📄 License
-[MIT License](LICENSE) © 2026 ZhuLinsen
-
-如果你在项目中使用或基于本项目进行二次开发，
-非常欢迎在 README 或文档中注明来源并附上本仓库链接。
-这将有助于项目的持续维护和社区发展。
-
-## 📬 联系与合作
-- GitHub Issues：[提交 Issue](https://github.com/ZhuLinsen/daily_stock_analysis/issues)
-
-## ⭐ Star History
-**如果觉得有用，请给个 ⭐ Star 支持一下！**
-
-<a href="https://star-history.com/#ZhuLinsen/daily_stock_analysis&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ZhuLinsen/daily_stock_analysis&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ZhuLinsen/daily_stock_analysis&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ZhuLinsen/daily_stock_analysis&type=Date" />
- </picture>
-</a>
-
-## ⚠️ 免责声明
-
-本项目仅供学习和研究使用，不构成任何投资建议。股市有风险，投资需谨慎。作者不对使用本项目产生的任何损失负责。
-
----
+<!-- Railway deployment sync trigger: 2026-09-09 -->
