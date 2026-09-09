@@ -2,8 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
-// https://vite.dev/config/
+// GitHub Pages is served from /daily_stock_analysis/ while the container serves at /.
+const base = process.env.VITE_BASE_PATH || '/'
+
 export default defineConfig({
+  base,
   plugins: [
     react({
       babel: {
@@ -12,8 +15,8 @@ export default defineConfig({
     }),
   ],
   server: {
-    host: '0.0.0.0',  // 允许公网访问
-    port: 5173,       // 默认端口
+    host: '0.0.0.0',
+    port: 5173,
   },
   build: {
     // 打包输出到项目根目录的 static 文件夹
