@@ -31,14 +31,15 @@ COPY patch/ ./patch/
 COPY src/ ./src/
 COPY strategies/ ./strategies/
 COPY --from=web-builder /app/static ./static/
+COPY docker/entrypoint.sh /app/entrypoint.sh
 
-RUN mkdir -p /app/data /app/logs /app/reports
+RUN chmod +x /app/entrypoint.sh && mkdir -p /app/data /app/logs /app/reports
 
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:8000/api/health || curl -f http://localhost:8000/health || python -c "import sys; sys.exit(0)"
 
-# Web UI first: keeps the public service focused on serving the dashboard.
-# Scheduled analysis can be run separately by GitHub Actions / Railway cron.
-CMD ["python", "main.py", "--webui-only", "--host", "0.0.0.0", "--port", "8000"]
+# Entrypoint owns the runtime port and intentionally ignores platform CMD args.
+# This prevents a literal '$PORT' from reaching argparse on Railway.
+ENTRYPOINT ["/app/entrypoint.sh"]
