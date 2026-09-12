@@ -1,20 +1,46 @@
 import json
 import ssl
+import time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'apps' / 'dsa-web' / 'public' / 'data' / 'market.json'
 CN_TZ = timezone(timedelta(hours=8))
+EASTMONEY_HOSTS = ['push2.eastmoney.com', '80.push2.eastmoney.com', '82.push2.eastmoney.com', '88.push2.eastmoney.com', '99.push2.eastmoney.com']
 
 
 def get_json(url: str):
-    req = Request(url, headers={'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/'})
-    context = ssl.create_default_context()
-    with urlopen(req, timeout=30, context=context) as response:
-        return json.loads(response.read().decode('utf-8'))
+    """Fetch Eastmoney JSON with retry and host fallback for transient 502/503/504 errors."""
+    parts = urlsplit(url)
+    last_error = None
+    for host in EASTMONEY_HOSTS:
+        candidate = urlunsplit((parts.scheme, host, parts.path, parts.query, parts.fragment))
+        for attempt in range(3):
+            try:
+                req = Request(
+                    candidate,
+                    headers={
+                        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36',
+                        'Referer': 'https://quote.eastmoney.com/',
+                        'Accept': 'application/json,text/plain,*/*',
+                    },
+                )
+                context = ssl.create_default_context()
+                with urlopen(req, timeout=30, context=context) as response:
+                    payload = json.loads(response.read().decode('utf-8'))
+                    if not isinstance(payload, dict):
+                        raise ValueError('Eastmoney returned a non-object JSON response')
+                    return payload
+            except (HTTPError, URLError, TimeoutError, ValueError) as exc:
+                last_error = exc
+                if attempt < 2:
+                    time.sleep(2 ** attempt)
+        print(f'Warning: Eastmoney host {host} failed: {last_error}')
+    raise RuntimeError(f'All Eastmoney endpoints failed: {last_error}')
 
 
 def main():
