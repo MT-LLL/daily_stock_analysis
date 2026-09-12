@@ -1,6 +1,11 @@
 name: Update Daily Market Data
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/update_static_market.py'
+      - '.github/workflows/update-market-data.yml'
   schedule:
     - cron: '30 8 * * 1-5'
   workflow_dispatch:
